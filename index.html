@@ -1,12 +1,6 @@
----
-layout: default
-title: Littera scripta manet
----
-
-<!DOCTYPE html>
 <html>
 <head>
-    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@metamask/web3-shim@latest/dist/web3-shim.min.js"></script>
     <script src="assets/js/MetaMask_check.js"></script>
     <script src="assets/js/add_record.js"></script>
     <script src="assets/js/get_tablet_factory_instance.js"></script>
@@ -37,7 +31,7 @@ title: Littera scripta manet
                 // Checking if Web3 has been injected by the browser (Mist/MetaMask)
                 if (typeof web3 !== 'undefined') {
                     // Use Mist/MetaMask's provider
-                    window.web3 = new Web3(web3.currentProvider);
+                    window.web3 = new Web3(Web3.givenProvider);
                     global_active_account = web3.eth.accounts[0];
                     web3.version.getNetwork((err, netId) => {
                         switch (netId) {
