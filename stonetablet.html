@@ -3,38 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablet Factory Web Wallet</title>
+    <title>Stone Tablet Factory 2017</title>
 
-    <!-- Include Web3.js from a CDN -->
+    <!-- First load Web3 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nes.css/2.3.0/css/nes.min.css" />
-    <script src="assets/js/add_record.js"></script>
-    <script src="assets/js/get_tablet_factory_instance.js"></script>
+    
+    <!-- Then load get_tablet_instance.js as it's used by other scripts -->
     <script src="assets/js/get_tablet_instance.js"></script>
-    <script src="assets/js/make_tablet.js"></script>
+    <script src="assets/js/get_tablet_factory_instance.js"></script>
+    
+    <!-- Then load all other dependent scripts -->
+    <script src="assets/js/MetaMask_check.js"></script>
+    <script src="assets/js/wallet_address_click.js"></script>
+    <script src="assets/js/sort_table.js"></script>
+    <script src="assets/js/connect_wallet.js"></script>
+    <script src="assets/js/theme_switcher.js"></script>
     <script src="assets/js/show_records.js"></script>
+    <script src="assets/js/add_record.js"></script>
+    <script src="assets/js/make_tablet.js"></script>
     <script src="assets/js/show_tablets.js"></script>
     <script src="assets/js/sort_table.js"></script>
-    <script src="assets/js/tablet_is_created.js"></script>
-    <script src="assets/js/update_bytes_limit.js"></script>
-    <script src="assets/js/wallet_address_click.js"></script>
     <script src="assets/js/get_owner.js"></script>
     <script src="assets/js/get_scribes.js"></script>
     <script src="assets/js/add_scribe.js"></script>
     <script src="assets/js/remove_scribe.js"></script>
     <script src="assets/js/transfer_ownership.js"></script>
+    <script src="assets/js/update_bytes_limit.js"></script>
     <script src="assets/js/open_tab.js"></script>
-
+    <script src="assets/js/populate_tablet_dropdowns.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body class="nes-container is-dark with-title">
-    <h1 class="nes-text is-primary">Tablet Factory Web Wallet</h1>
-
-    <div id="connect-wallet" class="nes-container with-title">
-        <button id="connectButton" class="nes-btn is-primary">Connect Wallet</button>
-        <p id="walletAddress" class="nes-text">Wallet not connected</p>
+    <h1 class="nes-text is-primary">Stone Tablet Factory 2017</h1>
+    <div class="row">
+        <div id="connect-wallet" class="nes-container with-title centered-container">
+            <div class="wallet-controls">
+                <button id="connectButton" class="nes-btn is-blue">Connect Wallet</button>
+                <div class="nes-field">
+                    <label>
+                        <input type="checkbox" id="modeSwitch" class="nes-checkbox">
+                        <span>Light Mode</span>
+                    </label>
+                </div>
+            </div>
+            <p id="walletAddress" class="nes-text">Wallet not connected</p>
+        </div>
     </div>
 
-    <div id="tablet-creation">
+    <div id="tablet-creation" class="centered-container">
         <h2 class="nes-text is-primary">Create a New Tablet</h2>
         <label for="tabletName" class="nes-text">Tablet Name (32 chars max):</label>
         <input type="text" id="tabletName" maxlength="32" class="nes-input" placeholder="Enter tablet name">
@@ -42,63 +58,67 @@
         <label for="tipValue" class="nes-text">Tip (ETH):</label>
         <input type="number" id="tipValue" class="nes-input" min="0" step="0.01" value="0">
 
-        <button id="createTabletButton" class="nes-btn is-success">Create Tablet</button>
+        <button id="createTabletButton" class="nes-btn is-warning">Create Tablet</button>
         <p id="transactionStatus" class="nes-text"></p>
     </div>
 
-    <div id="my-tablets" class="nes-container with-title">
+    <div id="my-tablets" class="nes-container with-title centered-container">
         <h2 class="nes-text is-primary">My Tablets</h2>
         <button id="showTabletsButton" class="nes-btn is-warning">Show My Tablets</button>
         <div id="my_tablets"></div>
     </div>
-    <div id="tablet_tab" class="tabcontent nes-container with-title">
-        <fieldset>
-                <legend><h2>Tablet records</h2></legend>
-                
-                Tablet address: <br>
-                <input type="text" size="42" id="tablet" value="" maxlength=42 class="nes-input"></input>
-                <input type="button" value="show all records" onclick="show_records()">
-                <input type="button" value="clear" onclick="document.getElementById('my_records').innerHTML = ''"></p>
+    <div id="tablet_tab" class="centered-container">
+        <h2 class="nes-text is-primary">Tablet Records</h2>
+        <div class="nes-container with-title centered-container">
+            Tablet address: <br>
+            <div id="records-dropdown-container">
+                <select id="tabletRecordsSelector" class="tablet-selector nes-select">
+                    <option value="">Select a tablet...</option>
+                </select>
+            </div>
+            <input type="text" size="42" id="tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
+            <input type="button" value="Show All Records" class="nes-btn is-warning" onclick="window.show_records()">
+            <input type="button" value="Clear" class="nes-btn is-warning" onclick="document.getElementById('my_records').innerHTML = ''"></p>
 
-                <p id="my_records"></p>
-                You have <strong id="bytes_limit">2048</strong> bytes left <br>
-                <textarea id="record_to_add" cols="80" rows="5" class="nes-textarea" oninput="update_bytes_limit()"></textarea>
-                <input type="button" value="add record" onclick="add_record()"></p>
-                <p id="add_record_result"></p>
-        </fieldset>    
+            <div id="my_records" class="nes-container"></div>
+            Add a new record, you have <strong id="bytes_limit">2048</strong> bytes left <br>
+            <textarea id="record_to_add" cols="80" rows="5" class="nes-textarea" oninput="window.update_bytes_limit()"></textarea>
+            <input type="button" value="Add Record" class="nes-btn is-warning" onclick="window.add_record()"></p>
+            <p id="add_record_result"></p>
+        </div>    
     </div>
     
     <!-- <p></p> -->
 
-    <div id="settings_tab" class="tabcontent nes-container with-title">
+    <div id="settings_tab" class="centered-container nes-container with-title centered-container">
         <fieldset>
             <legend><h2>Tablet settings</h2></legend>
             Tablet address: <br>
-            <input type="text" size="42" id="settings_tablet" value="" maxlength=42 class="nes-input"></input>
-            <input type="button" value="show owner" onclick="get_owner()">
+            <div id="transfer-dropdown-container">
+                <select id="transferTabletSelector" class="tablet-selector nes-select">
+                    <option value="">Select a tablet...</option>
+                </select>
+            </div>
+            <input type="text" size="42" id="settings_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
             <p>Tablet owner: <span id="tablet_owner"></span> </p>
             <fieldset>
-                <legend><h3>Tablet scribes</h3></legend>
-                
-                <input type="button" value="show scribes" onclick="get_scribes()">
-                <input type="button" value="clear" onclick="document.getElementById('scribes').innerHTML = ''"></p>
-
-                <p id="scribes"></p>
-                
-                <input type="text" size="42" id="add_scribe_address" value="" maxlength=42 class="nes-input"></input>
-                <input type="button" value="add scribe" onclick="add_scribe()"></p>
-                <p id="add_scribe_result"></p>
-
-                <input type="text" size="42" id="remove_scribe_address" value="" maxlength=42 class="nes-input"></input>
-                <input type="button" value="remove scribe" onclick="remove_scribe()"></p>
-                <p id="remove_scribe_result"></p>
+               
             </fieldset>
+            <input type="button" value="Show Owner" class="nes-btn is-warning" onclick="get_owner()">
             <p></p>
-            <fieldset style="border: 1px red solid;">
-                <legend><h3 style="color:red;">DANGER ZONE! Transfer ownership</h3></legend>
+            <fieldset class="danger-zone">
+                <legend><h3 class="danger-zone-title">DANGER ZONE! Transfer ownership</h3></legend>
+                Tablet to transfer: <br>
+                <div id="transfer-ownership-dropdown-container">
+                    <select id="transferOwnershipSelector" class="tablet-selector nes-select">
+                        <option value="">Select a tablet...</option>
+                    </select>
+                </div>
+                <input type="text" size="42" id="transfer_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
+                <br><br>
                 Transfer tablet ownership to address: <br>
-                <input type="text" size="42" id="transfer_ownership_address" value="" maxlength=42 class="nes-input"></input>
-                <input type="button" value="transfer" onclick="transfer_ownership()" style="color:red;"></p>
+                <input type="text" size="42" id="transfer_ownership_address" value="" maxlength=42 class="nes-input">
+                <input type="button" id="transferButton" value="Transfer" class="nes-btn is-warning" onclick="confirm_transfer()"></p>
                 <p id="transfer_ownership_result"></p>
             </fieldset>
         </fieldset>
@@ -107,140 +127,19 @@
     <script>
         // Variables
         let web3;
-        let tabletFactoryContract;
-        let userAccount;
-
-        // Tablet Factory Contract Details
-        const contractAddress = "0x1CF47e78bf9c5e0403FACF7B9B261BE3998DeB8F"; // Replace with actual contract address
-        const abi = [{"constant":true,"inputs":[],"name":"creators_count","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"new_tablet_name","type":"bytes32"}],"name":"create_tablet","outputs":[{"name":"","type":"address"}],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"},{"name":"","type":"uint256"}],"name":"tablets","outputs":[{"name":"tablet_name","type":"bytes32"},{"name":"tablet_address","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"creator_address","type":"address"}],"name":"is_creator","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"creators","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"creator_address","type":"address"}],"name":"creator_tablets_count","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]; // Replace with actual ABI
+        window.tabletFactoryContract = null;
+        window.userAccount = null;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Connect to MetaMask
-            document.getElementById("connectButton").addEventListener("click", async () => {
-                if (typeof window.ethereum !== "undefined") {
-                    try {
-                        // Request account access
-                        await ethereum.request({ method: "eth_requestAccounts" });
-
-                        // Initialize Web3
-                        web3 = new Web3(window.ethereum);
-
-                        // Get connected account
-                        const accounts = await web3.eth.getAccounts();
-                        userAccount = accounts[0];
-
-                        // Display connected account
-                        document.getElementById("walletAddress").innerText = `Connected Wallet: ${userAccount}`;
-
-                        // Initialize contract instance
-                        tabletFactoryContract = new web3.eth.Contract(abi, contractAddress);
-                    } catch (error) {
-                        console.error("Error connecting to MetaMask", error);
-                    }
-                } else {
-                    alert("MetaMask is not installed. Please install MetaMask and try again.");
-                }
-            });
-
-            // Create Tablet
-            document.getElementById("createTabletButton").addEventListener("click", async () => {
-                if (!tabletFactoryContract || !userAccount) {
-                    alert("Please connect your wallet first.");
-                    return;
-                }
-
-                const tabletName = document.getElementById("tabletName").value;
-                const tipValue = parseFloat(document.getElementById("tipValue").value) || 0;
-
-                if (!tabletName) {
-                    alert("Please enter a valid tablet name.");
-                    return;
-                }
-
-                try {
-                    document.getElementById("transactionStatus").innerText = "Sending transaction...";
-
-                    // Convert tip value to Wei
-                    const tipInWei = web3.utils.toWei(tipValue.toString(), "ether");
-
-                    // Send transaction
-                    const tx = await tabletFactoryContract.methods.create_tablet(web3.utils.asciiToHex(tabletName))
-                        .send({ from: userAccount, value: tipInWei });
-
-                    // Transaction successful
-                    document.getElementById("transactionStatus").innerText = `Transaction successful! Hash: ${tx.transactionHash}`;
-                    console.log("Transaction details:", tx);
-                } catch (error) {
-                    console.error("Error creating tablet", error);
-                    document.getElementById("transactionStatus").innerText = "Transaction failed. Check console for details.";
-                }
-            });
-
-            // Show My Tablets
+            // Initialize wallet connection
+            window.initializeWallet();
+            
+            // Initialize theme switcher
+            window.initializeThemeSwitcher();
+            
+            // Show My Tablets button
             document.getElementById("showTabletsButton").addEventListener("click", show_tablets);
         });
-
-        function show_tablets() {
-            MetaMask_check();
-            document.getElementById("my_tablets").innerHTML = "";
-            var creator_address = userAccount;
-            var tablet_factory_instance = tabletFactoryContract;
-            console.log(tablet_factory_instance);
-            tablet_factory_instance.methods.creator_tablets_count(creator_address).call()
-            .then(tablets_count => {
-                var my_tablets_table_html = `
-                <table id="tablets_table" class="nes-table is-bordered is-centered">
-                <tr>
-                    <th class="row-1 row-ID" style="color: black;">№</th>
-                    <th class="row-2 row-name" style="color: black;">Name</th>
-                    <th class="row-2 row-address" style="color: black;">Address</th>
-                </tr>`;
-                console.log("tablets_count " + tablets_count);
-                var t;
-                var retrieved_tables_count = 0;
-                for (t = 0; t < tablets_count; t++) {
-                (function (t) {
-                    console.log(t);
-                    tablet_factory_instance.methods.tablets(creator_address, t).call()
-                    .then(tablet => {
-                        console.log(tablet);
-                        var new_tablet_html = `
-                        <tr>
-                        <td style="color: black;">` + (t + 1) + `</td>
-                        <td style="color: black;">` + web3.utils.hexToAscii(tablet.tablet_name) + `</td>
-                        <td class="wallet_link" style="color: black;" onclick="wallet_address_click(this)">` + tablet.tablet_address + `</td>
-                        </tr>`;
-                        my_tablets_table_html = my_tablets_table_html + new_tablet_html;
-                        document.getElementById("my_tablets").innerHTML = my_tablets_table_html + " </table>";
-                        retrieved_tables_count = retrieved_tables_count + 1;
-                        console.log("retrieved_tables_count: " + retrieved_tables_count);
-                        if (retrieved_tables_count == tablets_count) {
-                        console.log("calling sort");
-                        sort_table(document.getElementById("tablets_table"));
-                        }
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
-                })(t);
-                }
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        }
-
-        function MetaMask_check() {
-            if (typeof window.ethereum === "undefined") {
-                alert("MetaMask is not installed. Please install MetaMask and try again.");
-            }
-        }
-
-        function sort_table(table) {
-        }
-
-        function wallet_address_click(element) {
-        }
     </script>
 </body>
 </html>

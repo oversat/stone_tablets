@@ -1,52 +1,86 @@
 function show_tablets() {
     MetaMask_check();
+    
+    // Clear previous content
     document.getElementById("my_tablets").innerHTML = "";
-    var creator_address = global_active_account;
-    var tablet_factory_instance = get_tablet_factory_instance(document.getElementById("tablet_factory").value);
-    console.log(tablet_factory_instance);
+    
+    // Verify wallet connection
+    if (!window.userAccount) {
+        document.getElementById("my_tablets").innerHTML = `
+            <div class="nes-text is-error">
+                Please connect your wallet first!
+            </div>`;
+        return;
+    }
+
+    // Initialize table HTML with black text class for headers
+    let my_tablets_table_html = `
+        <table id="tablets_table" class="nes-table is-bordered is-centered">
+            <tr>
+                <th class="row-ID table-header">№</th>
+                <th class="row-name table-header">Name</th>
+                <th class="row-address table-header">Address</th>
+            </tr>`;
+
+    var creator_address = window.userAccount;
+    var tablet_factory_instance = window.tabletFactoryContract;
+
+    if (!tablet_factory_instance) {
+        console.error("Contract not initialized");
+        document.getElementById("my_tablets").innerHTML = `
+            <div class="nes-text is-error">
+                Please connect your wallet first!
+            </div>`;
+        return;
+    }
+
+    console.log("Contract instance:", tablet_factory_instance);
+    
     tablet_factory_instance.methods.creator_tablets_count(creator_address).call()
     .then(tablets_count => {
-        var my_tablets_table_html = 
-        `
-        <table id="tablets_table">
-            <tr>
-                <th class="row-1 row-ID">№</th>
-                <th class="row-2 row-name">Name</th>
-                <th class="row-2 row-address">Address</th>
-            </tr>                        
-        `
-        console.log("tablets_count "+tablets_count)
-        var t;
+        console.log("tablets_count " + tablets_count);
+        
         var retrieved_tables_count = 0;
-        for (t = 0; t < tablets_count; t++) {
+        for (let t = 0; t < tablets_count; t++) {
             (function (t) {
-                console.log(t);
+                console.log("Fetching tablet", t);
                 tablet_factory_instance.methods.tablets(creator_address, t).call()
                 .then(tablet => {
-                    console.log(tablet);
+                    console.log("Tablet data:", tablet);
                     var new_tablet_html = `
                     <tr>
-                        <td>` + eval(t + 1) + `</td>
-                        <td>` + web3.toAscii(tablet[0]) + `</td>
-                        <td class="wallet_link" onclick="wallet_address_click(this)">` + tablet[1] + `</td>
-                    </tr>
-                    `
-                    my_tablets_table_html = my_tablets_table_html + new_tablet_html;
-                    document.getElementById("my_tablets").innerHTML = my_tablets_table_html + " </table>";
-                    retrieved_tables_count = retrieved_tables_count + 1;
-                    console.log("retrieved_tables_count: " + retrieved_tables_count);
+                        <td class="row-1">${t + 1}</td>
+                        <td class="row-2">${web3.utils.hexToAscii(tablet.tablet_name)}</td>
+                        <td class="row-2">
+                            <a href="https://etherscan.io/address/${tablet.tablet_address}" 
+                               class="contract-link" 
+                               target="_blank" 
+                               rel="noopener noreferrer">${tablet.tablet_address}</a>
+                        </td>
+                    </tr>`;
+                    my_tablets_table_html += new_tablet_html;
+                    document.getElementById("my_tablets").innerHTML = my_tablets_table_html + "</table>";
+                    retrieved_tables_count++;
+                    
                     if (retrieved_tables_count == tablets_count) {
-                        console.log("calling sort");
+                        console.log("All tablets retrieved, sorting table");
                         sort_table(document.getElementById("tablets_table"));
                     }
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.error(`Error fetching tablet ${t}:`, error);
                 });
-            })(t);                           
-        }                        
+            })(t);
+        }
     })
     .catch(error => {
-        console.error(error);
+        console.error("Error getting tablets count:", error);
+        document.getElementById("my_tablets").innerHTML = `
+            <div class="nes-text is-error">
+                Error fetching tablets: ${error.message}
+            </div>`;
     });
 }
+
+// Export the function
+window.show_tablets = show_tablets;

@@ -1,53 +1,84 @@
----
----
+@import "https://cdnjs.cloudflare.com/ajax/libs/nes.css/2.3.0/css/nes.min.css";
 
-@import "{{ site.theme }}";
+/* Theme Variables */
+:root {
+    --bg-color: #c0c0c0;
+    --text-color: #000;
+    --container-bg: #fff;
+    --container-border: #000;
+}
+
+body.is-dark {
+    --bg-color: #212529;
+    --text-color: #fff;
+    --container-bg: #2f3337;
+    --container-border: #4a4a4a;
+}
 
 .wrapper {
-    width: 1060px;
-  }
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
 section {
-    width: 700px;
-  }
+    width: 100%;
+}
 
 header ul a {
-    line-height:1;
-    font-size:11px;
-    color:#676767;
-    display:block;
-    text-align:center;
-    padding-top:14px;
-    height:34px;
-  }
+    line-height: 1;
+    font-size: 11px;
+    color: #676767;
+    display: block;
+    text-align: center;
+    padding-top: 14px;
+    height: 34px;
+}
 
 header ul a:hover {
     cursor: default;
-   }
+}
 
 .pending {
     -webkit-animation: pending 2s infinite;
+    animation: pending 2s infinite;
 }
 
-@-webkit-keyframes pending
-{
-0% {opacity:0.3;}
-20% {opacity:0.3;}
-40% {opacity:.7;}
-60% {opacity:1;}
-80% {opacity:0.7;}
-100% {opacity:0.3;}
+@-webkit-keyframes pending {
+    0% { opacity: 0.3; }
+    20% { opacity: 0.3; }
+    40% { opacity: 0.7; }
+    60% { opacity: 1; }
+    80% { opacity: 0.7; }
+    100% { opacity: 0.3; }
+}
+
+@keyframes pending {
+    0% { opacity: 0.3; }
+    20% { opacity: 0.3; }
+    40% { opacity: 0.7; }
+    60% { opacity: 1; }
+    80% { opacity: 0.7; }
+    100% { opacity: 0.3; }
 }
 
 .wallet_link {
     cursor: pointer;
-    color: blue;
+    color: #209cee;
     text-decoration: underline;
 }
 
 .wallet_link:hover {
     text-decoration: none;
     text-shadow: 1px 1px 1px #555;
+}
+
+.wallet-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
 }
 
 table {
@@ -59,9 +90,6 @@ table {
 th, td {
     word-wrap: break-word;
     white-space: pre-wrap;
-    // padding: 5px 10px;
-    // text-align: left;
-    // border-bottom: 1px solid #ddd;
 }
 
 .row-ID {
@@ -86,9 +114,353 @@ th, td {
 }
 
 .tx_error {
-    color: red;
+    color: #ff0000;
 }
 
 .tabcontent {
     display: none;
+}
+
+/* Win32 style interface */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nes-container {
+    background-color: var(--container-bg);
+    border: 2px solid var(--container-border);
+    box-shadow: 2px 2px 0 var(--container-border);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.nes-text {
+    color: var(--text-color);
+}
+
+.nes-btn {
+    color: var(--text-color);
+}
+
+.nes-input, .nes-select, .nes-textarea {
+    background-color: var(--container-bg);
+    border-color: var(--container-border);
+    color: var(--text-color);
+}
+
+.nes-container.with-title input.nes-input,
+.nes-container.with-title select.nes-select,
+.nes-container.with-title textarea.nes-textarea {
+    width: 100% !important;
+    margin-bottom: 1em;
+}
+
+/* Light Mode Toggle Styles */
+#modeSwitch + span {
+    display: inline-block;
+    padding: 8px 16px;
+    border: 2px solid #000;
+    transition: border-color 0.3s ease;
+}
+
+#modeSwitch:checked + span {
+    animation: borderColorCycle 2s infinite;
+}
+
+@keyframes borderColorCycle {
+    0% { border-color: #000; }
+    33% { border-color: #f7d51d; }
+    66% { border-color: #209cee; }
+    100% { border-color: #000; }
+}
+
+/* NES.css Complementary Styles */
+.centered-container {
+    text-align: center;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.danger-zone {
+    border: 2px dashed #ff0000;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.danger-zone-title {
+    color: #ff0000;
+}
+
+.is-shaking {
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+/* Light mode specific overrides */
+body.is-light {
+    .nes-text.is-primary {
+        color: #209cee;
+    }
+
+    /* Keep tablet owner text black in light mode */
+    #tablet_owner {
+        color: black !important;
+    }
+
+    /* Make wallet address black in light mode */
+    #walletAddress {
+        color: black !important;
+    }
+}
+
+/* Dark mode specific overrides */
+body.is-dark {
+    .nes-text.is-primary {
+        color: #4aa9fa;
+    }
+   
+    /* Button text color override for dark mode */
+    .nes-btn {
+        color: black !important;
+    }
+
+    /* Make tablet owner text white in dark mode */
+    #tablet_owner {
+        color: white !important;
+    }
+
+    /* Keep wallet address white in dark mode */
+    #walletAddress {
+        color: white !important;
+    }
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .wrapper {
+        width: 95%;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    .row-ID {
+        width: 15%;
+    }
+
+    .row-name {
+        width: 35%;
+    }
+
+    .row-text {
+        width: 100%;
+    }
+
+    .row-address {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .wrapper {
+        width: 98%;
+    }
+
+    table {
+        font-size: 12px;
+    }
+}
+
+/* Table text colors */
+.nes-table {
+    &.is-bordered {
+        tr {
+            th.table-header {
+                color: black !important;
+            }
+            td {
+                color: black !important;
+            }
+            
+            .contract-link {
+                color: #209cee !important;
+            }
+        }
+    }
+}
+
+/* Record display colors */
+#my_records {
+    .record-item {
+        color: black !important;
+        
+        .record-number {
+            color: black !important;
+            font-weight: bold;
+        }
+        
+        .record-content {
+            color: black !important;
+        }
+    }
+}
+
+/* Settings and status text */
+#tablet_owner,
+#walletAddress,
+#transactionStatus,
+#add_record_result,
+#transfer_ownership_result:not(.tx_error) {
+    /* Remove default color to allow mode-specific colors */
+}
+
+/* Keep error messages in red */
+.tx_error {
+    color: #ff0000 !important;
+}
+
+/* Keep the pending animation but with black text */
+.pending {
+    color: black !important;
+    -webkit-animation: pending 2s infinite;
+    animation: pending 2s infinite;
+}
+
+/* Records Table Styles */
+.records-table-container {
+    background-color: white;
+    border: 2px solid #000;
+    margin: 20px 0;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.records-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Press Start 2P', monospace;
+    
+    // Header styles
+    .header-row th {
+        background-color: white;
+        color: black;
+        padding: 15px;
+        text-align: center;
+        border-bottom: 2px solid #000;
+        font-size: 0.9em;
+    }
+    
+    // Subheader styles
+    .subheader-row th {
+        background-color: #f8f8f8;
+        color: black;
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid #000;
+        font-size: 0.85em;
+        
+        &:first-child {
+            width: 80px;
+            text-align: center;
+        }
+    }
+    
+    // Record number column
+    .record-number {
+        background-color: white;
+        color: black;
+        text-align: center;
+        font-weight: bold;
+        padding: 10px;
+        border-right: 2px solid #000;
+        font-size: 0.8em;
+    }
+    
+    // Record content column
+    .record-content {
+        background-color: white;
+        color: black;
+        padding: 10px 15px;
+        text-align: left;
+        line-height: 1.4;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    
+    // Row styles
+    tr {
+        border-bottom: 1px solid #ddd;
+        
+        &:last-child {
+            border-bottom: none;
+        }
+        
+        &:hover {
+            .record-content {
+                background-color: #f9f9f9;
+            }
+        }
+    }
+    
+    // Error message styling
+    .error-text {
+        color: #ff0000;
+        padding: 10px;
+        font-style: italic;
+        text-align: center;
+        background-color: #fff;
+    }
+}
+
+// Make contract address selectable
+.records-table .header-row th {
+    user-select: all;
+    cursor: text;
+    
+    &::selection {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+}
+
+// Ensure white background and black text
+.records-table *,
+.records-table-container * {
+    background-color: white !important;
+    color: black !important;
+}
+
+// Responsive adjustments
+@media screen and (max-width: 768px) {
+    .records-table {
+        font-size: 14px;
+        
+        .header-row th {
+            padding: 10px;
+        }
+        
+        .record-number,
+        .record-content {
+            padding: 8px;
+        }
+    }
+}
+
+/* Title styles */
+h1.nes-text.is-primary {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 2em;
 }

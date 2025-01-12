@@ -1,119 +1,145 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/@metamask/web3-shim@latest/dist/web3-shim.min.js"></script>
-    <script src="assets/js/MetaMask_check.js"></script>
-    <script src="assets/js/add_record.js"></script>
-    <script src="assets/js/get_tablet_factory_instance.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stone Tablet Factory 2017</title>
+
+    <!-- First load Web3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.8.0/web3.min.js"></script>
+    
+    <!-- Then load get_tablet_instance.js as it's used by other scripts -->
     <script src="assets/js/get_tablet_instance.js"></script>
-    <script src="assets/js/make_tablet.js"></script>
+    <script src="assets/js/get_tablet_factory_instance.js"></script>
+    
+    <!-- Then load all other dependent scripts -->
+    <script src="assets/js/MetaMask_check.js"></script>
+    <script src="assets/js/wallet_address_click.js"></script>
+    <script src="assets/js/sort_table.js"></script>
+    <script src="assets/js/connect_wallet.js"></script>
+    <script src="assets/js/theme_switcher.js"></script>
     <script src="assets/js/show_records.js"></script>
+    <script src="assets/js/add_record.js"></script>
+    <script src="assets/js/make_tablet.js"></script>
     <script src="assets/js/show_tablets.js"></script>
     <script src="assets/js/sort_table.js"></script>
-    <script src="assets/js/tablet_is_created.js"></script>
-    <script src="assets/js/update_bytes_limit.js"></script>
-    <script src="assets/js/wallet_address_click.js"></script>
     <script src="assets/js/get_owner.js"></script>
     <script src="assets/js/get_scribes.js"></script>
     <script src="assets/js/add_scribe.js"></script>
     <script src="assets/js/remove_scribe.js"></script>
     <script src="assets/js/transfer_ownership.js"></script>
+    <script src="assets/js/update_bytes_limit.js"></script>
     <script src="assets/js/open_tab.js"></script>
-
-    <script>
-        (async () => {
-            await MetaMask_check();
-            window.addEventListener('load', function() {
-                document.getElementById("defaultOpen").click();
-            });
-        })();
-    </script>
+    <script src="assets/js/populate_tablet_dropdowns.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css" />
 </head>
-
-<body>
-    <div id="MetaMask_warning"></div>
-    <div id="factory_tab" class="tabcontent">
-        <fieldset>
-            <legend><h2>Tablet factory</h2></legend>
-            
-            Tablet factory address: <br>
-            <input type="text" size="42" id="tablet_factory" value="" disabled></input> <span id="active_net"> </span>
-            
-            <p>Tablet name:<br>
-            <input id="desired_tablet_name" type="text" maxlength=32 size=32 pattern="^[0-9a-fA-F]$">
-            <input type="button" value="make tablet" onclick="make_tablet()">
-            <input type="checkbox" id="tip" value="tip_me"> tip </input>
-            <input id="tip_value" type="number" min=0 value=0.01 step=0.01 style="width:50px;"> ETH</input>
-            </p>
-            <p>Tablet address:<br><span id="new_tablet_address" class="wallet_link" onclick="wallet_address_click(this)"></span></p>
-
-        </fieldset>
-    
-        <p></p>
-        
-        <fieldset>
-                <legend><h2>Tablets created by you</h2></legend>
-                
-                Choose desired addres in MetaMask then click <input type="button" value="show tablets" onclick="show_tablets()">
-                    <input type="button" value="clear" onclick="document.getElementById('my_tablets').innerHTML = ''"></p>
-        
-                <p id="my_tablets"></p>
-        
-        </fieldset>
+<body class="nes-container is-dark with-title">
+    <h1 class="nes-text is-primary">Stone Tablet Factory 2017</h1>
+    <div class="row">
+        <div id="connect-wallet" class="nes-container with-title centered-container">
+            <div class="wallet-controls">
+                <button id="connectButton" class="nes-btn is-blue">Connect Wallet</button>
+                <div class="nes-field">
+                    <label>
+                        <input type="checkbox" id="modeSwitch" class="nes-checkbox">
+                        <span>Light Mode</span>
+                    </label>
+                </div>
+            </div>
+            <p id="walletAddress" class="nes-text">Wallet not connected</p>
+        </div>
     </div>
 
-    <!-- <p></p> -->
+    <div id="tablet-creation" class="centered-container">
+        <h2 class="nes-text is-primary">Create a New Tablet</h2>
+        <label for="tabletName" class="nes-text">Tablet Name (32 chars max):</label>
+        <input type="text" id="tabletName" maxlength="32" class="nes-input" placeholder="Enter tablet name">
 
-    <div id="tablet_tab" class="tabcontent">
-        <fieldset>
-                <legend><h2>Tablet records</h2></legend>
-                
-                Tablet address: <br>
-                <input type="text" size="42" id="tablet" value="" maxlength=42></input>
-                <input type="button" value="show all records" onclick="show_records()">
-                <input type="button" value="clear" onclick="document.getElementById('my_records').innerHTML = ''"></p>
+        <label for="tipValue" class="nes-text">Tip (ETH):</label>
+        <input type="number" id="tipValue" class="nes-input" min="0" step="0.01" value="0">
 
-                <p id="my_records"></p>
-                You have <strong id="bytes_limit">2048</strong> bytes left <br>
-                <textarea id="record_to_add" cols="80" rows="5" oninput="update_bytes_limit()"></textarea>
-                <input type="button" value="add record" onclick="add_record()"></p>
-                <p id="add_record_result"></p>
-        </fieldset>    
+        <button id="createTabletButton" class="nes-btn is-warning">Create Tablet</button>
+        <p id="transactionStatus" class="nes-text"></p>
+    </div>
+
+    <div id="my-tablets" class="nes-container with-title centered-container">
+        <h2 class="nes-text is-primary">My Tablets</h2>
+        <button id="showTabletsButton" class="nes-btn is-warning">Show My Tablets</button>
+        <div id="my_tablets"></div>
+    </div>
+    <div id="tablet_tab" class="centered-container">
+        <h2 class="nes-text is-primary">Tablet Records</h2>
+        <div class="nes-container with-title centered-container">
+            Tablet address: <br>
+            <div id="records-dropdown-container">
+                <select id="tabletRecordsSelector" class="tablet-selector nes-select">
+                    <option value="">Select a tablet...</option>
+                </select>
+            </div>
+            <input type="text" size="42" id="tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
+            <input type="button" value="Show All Records" class="nes-btn is-warning" onclick="window.show_records()">
+            <input type="button" value="Clear" class="nes-btn is-warning" onclick="document.getElementById('my_records').innerHTML = ''"></p>
+
+            <div id="my_records" class="nes-container"></div>
+            Add a new record, you have <strong id="bytes_limit">2048</strong> bytes left <br>
+            <textarea id="record_to_add" cols="80" rows="5" class="nes-textarea" oninput="window.update_bytes_limit()"></textarea>
+            <input type="button" value="Add Record" class="nes-btn is-warning" onclick="window.add_record()"></p>
+            <p id="add_record_result"></p>
+        </div>    
     </div>
     
     <!-- <p></p> -->
 
-    <div id="settings_tab" class="tabcontent">
+    <div id="settings_tab" class="centered-container nes-container with-title centered-container">
         <fieldset>
             <legend><h2>Tablet settings</h2></legend>
             Tablet address: <br>
-            <input type="text" size="42" id="settings_tablet" value="" maxlength=42></input>
-            <input type="button" value="show owner" onclick="get_owner()">
+            <div id="transfer-dropdown-container">
+                <select id="transferTabletSelector" class="tablet-selector nes-select">
+                    <option value="">Select a tablet...</option>
+                </select>
+            </div>
+            <input type="text" size="42" id="settings_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
             <p>Tablet owner: <span id="tablet_owner"></span> </p>
             <fieldset>
-                <legend><h3>Tablet scribes</h3></legend>
-                
-                <input type="button" value="show scribes" onclick="get_scribes()">
-                <input type="button" value="clear" onclick="document.getElementById('scribes').innerHTML = ''"></p>
-
-                <p id="scribes"></p>
-                
-                <input type="text" size="42" id="add_scribe_address" value="" maxlength=42></input>
-                <input type="button" value="add scribe" onclick="add_scribe()"></p>
-                <p id="add_scribe_result"></p>
-
-                <input type="text" size="42" id="remove_scribe_address" value="" maxlength=42></input>
-                <input type="button" value="remove scribe" onclick="remove_scribe()"></p>
-                <p id="remove_scribe_result"></p>
+               
             </fieldset>
+            <input type="button" value="Show Owner" class="nes-btn is-warning" onclick="get_owner()">
             <p></p>
-            <fieldset style="border: 1px red solid;">
-                <legend><h3 style="color:red;">DANGER ZONE! Transfer ownership</h3></legend>
+            <fieldset class="danger-zone">
+                <legend><h3 class="danger-zone-title">DANGER ZONE! Transfer ownership</h3></legend>
+                Tablet to transfer: <br>
+                <div id="transfer-ownership-dropdown-container">
+                    <select id="transferOwnershipSelector" class="tablet-selector nes-select">
+                        <option value="">Select a tablet...</option>
+                    </select>
+                </div>
+                <input type="text" size="42" id="transfer_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
+                <br><br>
                 Transfer tablet ownership to address: <br>
-                <input type="text" size="42" id="transfer_ownership_address" value="" maxlength=42></input>
-                <input type="button" value="transfer" onclick="transfer_ownership()" style="color:red;"></p>
+                <input type="text" size="42" id="transfer_ownership_address" value="" maxlength=42 class="nes-input">
+                <input type="button" id="transferButton" value="Transfer" class="nes-btn is-warning" onclick="confirm_transfer()"></p>
                 <p id="transfer_ownership_result"></p>
             </fieldset>
         </fieldset>
     </div>
+
+    <script>
+        // Variables
+        let web3;
+        window.tabletFactoryContract = null;
+        window.userAccount = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Initialize wallet connection
+            window.initializeWallet();
+            
+            // Initialize theme switcher
+            window.initializeThemeSwitcher();
+            
+            // Show My Tablets button
+            document.getElementById("showTabletsButton").addEventListener("click", show_tablets);
+        });
+    </script>
 </body>
 </html>

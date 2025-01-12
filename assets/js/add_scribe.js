@@ -1,9 +1,9 @@
 function add_scribe() {
     MetaMask_check();
-    var tablet_address = document.getElementById("settings_tablet").value;
+    var tablet_address = document.getElementById("tabletDropdown").value;
     var tablet_instance = get_tablet_instance(tablet_address);
     tablet_instance.methods.add_scribe(document.getElementById("add_scribe_address").value)
-    .send({ from: userAccount, value: "" })
+    .send({ from: userAccount })
     .then(tx_scribe_add => {
         document.getElementById("add_scribe_result").innerHTML = "adding";
         document.getElementById("add_scribe_result").className = "pending";
