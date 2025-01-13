@@ -1,3 +1,12 @@
 theme: jekyll-theme-minimal
 show_menu: true
-title: Stone Tablets
+title: Stone Tablet Factory 2017
+description: Ethereum-based stone tablet creation and management
+
+# Web3 settings
+network_id: 1
+factory_address: "0x1CF47e78bf9c5e0403FACF7B9B261BE3998DeB8F"
+
+# Layout settings
+show_downloads: false
+google_analytics: # Your GA code if needed

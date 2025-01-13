@@ -1,3 +1,10 @@
+function initializeTabs() {
+    // Hide all tabs initially except factory
+    document.getElementById('tablet_tab').style.display = 'none';
+    document.getElementById('settings_tab').style.display = 'none';
+    document.getElementById('factory_tab').style.display = 'block';
+}
+
 function open_tab(tab) {
     var i, tabcontent;//, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
@@ -11,3 +18,6 @@ function open_tab(tab) {
     document.getElementById(tab).style.display = "inline";
     //evt.currentTarget.className += " active";
 }
+
+window.open_tab = open_tab;
+window.initializeTabs = initializeTabs;
