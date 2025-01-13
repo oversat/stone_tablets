@@ -21,60 +21,70 @@ async function MetaMask_check() {
 }
 
 async function make_tablet() {
-    const global_active_account = await MetaMask_check();
-    if (!global_active_account) {
-        return; // Exit if MetaMask check failed
+    if (!window.userAccount) {
+        showNotification("Please connect your wallet first.", "error");
+        return;
+    }
+
+    const desiredTabletName = document.getElementById("desired_tablet_name").value;
+    
+    // Validate input
+    if (!desiredTabletName) {
+        showNotification("Please enter a valid tablet name.", "error");
+        return;
+    }
+
+    // Calculate tip
+    let tipValue = 0;
+    tipValue = parseFloat(document.getElementById("tip_value").value) || 0;
+    if (isNaN(tipValue) || tipValue < 0) {
+        showNotification("Tip amount must be a valid number >= 0", "error");
+        return;
     }
 
     try {
-        const web3 = new Web3(window.ethereum); // Ensure web3 is initialized
-        const tabletFactoryAddress = global_factory; // Use global_factory here
-        const tabletFactoryInstance = get_tablet_factory_instance(tabletFactoryAddress, web3); // Pass web3 instance
-        const desiredTabletName = document.getElementById("desired_tablet_name").value;
+        // Convert tablet name to bytes32
+        const tabletNameBytes32 = web3.utils.fromAscii(desiredTabletName);
+        // Convert ETH to Wei
+        const tipInWei = web3.utils.toWei(tipValue.toString(), 'ether');
 
-        // Validate input
-        if (!desiredTabletName) {
-            alert("Please enter a valid tablet name.");
-            return;
-        }
+        // Show pending notification
+        showNotification("Creating tablet...", "info");
 
-        // Calculate tip if checked
-        let tip = 0;
-        if (document.getElementById("tip").checked) {
-            const tipValue = parseFloat(document.getElementById("tip_value").value);
-            if (isNaN(tipValue) || tipValue <= 0) {
-                alert("Invalid tip value.");
-                return;
-            }
-            tip = web3.utils.toWei(tipValue.toString(), 'ether'); // Convert to Wei
-        }
-
-        // Send transaction to create tablet
-        const txCreateTablet = await tabletFactoryInstance.methods.create_tablet(
-            desiredTabletName
-        ).send({
-            from: global_active_account,
-            value: tip
-        });
-
-        // Show pending status
-        document.getElementById("new_tablet_address").innerHTML = "Pending tablet creation...";
-        document.getElementById("new_tablet_address").className = "pending";
-
-        console.log(`Create tablet transaction sent. Hash: ${txCreateTablet.transactionHash}`);
-
-        // Set interval to check for tablet creation
-        const tabletListener = setInterval(async () => {
-            const isCreated = await tablet_is_created(txCreateTablet.transactionHash, web3); // Pass web3 instance
-            if (isCreated) {
-                clearInterval(tabletListener);
-            }
-        }, 10000);
+        // Create tablet
+        window.tabletFactoryContract.methods.create_tablet(tabletNameBytes32)
+            .send({ 
+                from: window.userAccount,
+                value: tipInWei
+            })
+            .on('transactionHash', function(hash) {
+                console.log("Transaction hash:", hash);
+                showNotification("Transaction pending...", "info");
+            })
+            .on('receipt', function(receipt) {
+                console.log("Receipt:", receipt);
+                if (receipt.status) {
+                    showNotification(`Tablet created successfully!\nAddress: ${receipt.events.new_tablet_created.returnValues.tablet_address}`, "success");
+                    
+                    // Clear form
+                    document.getElementById("desired_tablet_name").value = "";
+                    document.getElementById("tip_value").value = "0";
+                    
+                    // Refresh dropdowns
+                    window.populate_tablet_dropdowns();
+                } else {
+                    showNotification("Transaction failed!", "error");
+                }
+            })
+            .on('error', function(error) {
+                console.error("Error creating tablet:", error);
+                showNotification("Error: " + error.message, "error");
+            });
 
     } catch (error) {
         console.error("Error creating tablet:", error);
-
-        // Optional: Display error to the user
-        alert("Failed to create tablet. Please check the console for more details.");
+        showNotification("Error: " + error.message, "error");
     }
 }
+
+window.make_tablet = make_tablet;

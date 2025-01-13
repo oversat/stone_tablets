@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- updated 2025-01-12 by Jeremiah Long -->
+
     <title>Stone Tablet Factory 2017</title>
 
     <!-- First load Web3 -->
@@ -13,6 +15,7 @@
     <script src="assets/js/get_tablet_factory_instance.js"></script>
     
     <!-- Then load all other dependent scripts -->
+    <script src="assets/js/utils.js"></script>
     <script src="assets/js/MetaMask_check.js"></script>
     <script src="assets/js/wallet_address_click.js"></script>
     <script src="assets/js/sort_table.js"></script>
@@ -31,6 +34,7 @@
     <script src="assets/js/update_bytes_limit.js"></script>
     <script src="assets/js/open_tab.js"></script>
     <script src="assets/js/populate_tablet_dropdowns.js"></script>
+    <script src="assets/js/list_all_tablets.js"></script>
     <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body class="nes-container is-dark with-title">
@@ -42,7 +46,7 @@
                 <div class="nes-field">
                     <label>
                         <input type="checkbox" id="modeSwitch" class="nes-checkbox">
-                        <span>Light Mode</span>
+                        <span id="modeLabel">Dark Mode</span>
                     </label>
                 </div>
             </div>
@@ -52,14 +56,13 @@
 
     <div id="tablet-creation" class="centered-container">
         <h2 class="nes-text is-primary">Create a New Tablet</h2>
-        <label for="tabletName" class="nes-text">Tablet Name (32 chars max):</label>
-        <input type="text" id="tabletName" maxlength="32" class="nes-input" placeholder="Enter tablet name">
+        <label for="desired_tablet_name" class="nes-text">Tablet Name (32 chars max):</label>
+        <input type="text" id="desired_tablet_name" maxlength="32" class="nes-input" placeholder="Enter tablet name">
 
-        <label for="tipValue" class="nes-text">Tip (ETH):</label>
-        <input type="number" id="tipValue" class="nes-input" min="0" step="0.01" value="0">
+        <label for="tip_value" class="nes-text">Optional Tip (ETH)</label>
+        <input type="number" id="tip_value" class="nes-input" min="0" step="0.01" value="0">
 
-        <button id="createTabletButton" class="nes-btn is-warning">Create Tablet</button>
-        <p id="transactionStatus" class="nes-text"></p>
+        <button id="createTabletButton" class="nes-btn is-warning" onclick="make_tablet()">Create Tablet</button>
     </div>
 
     <div id="my-tablets" class="nes-container with-title centered-container">
@@ -67,13 +70,20 @@
         <button id="showTabletsButton" class="nes-btn is-warning">Show My Tablets</button>
         <div id="my_tablets"></div>
     </div>
+
+    <div id="all-tablets" class="nes-container with-title centered-container">
+        <h2 class="nes-text is-primary">All Tablets</h2>
+        <button id="showAllTabletsButton" class="nes-btn is-warning" onclick="showAllTablets()">Show All Tablets</button>
+        <div id="all_tablets_container"></div>
+    </div>
+
     <div id="tablet_tab" class="centered-container">
         <h2 class="nes-text is-primary">Tablet Records</h2>
         <div class="nes-container with-title centered-container">
             Tablet address: <br>
             <div id="records-dropdown-container">
                 <select id="tabletRecordsSelector" class="tablet-selector nes-select">
-                    <option value="">Select a tablet...</option>
+                    <option value="">Select a tablet you own...</option>
                 </select>
             </div>
             <input type="text" size="42" id="tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
@@ -81,10 +91,17 @@
             <input type="button" value="Clear" class="nes-btn is-warning" onclick="document.getElementById('my_records').innerHTML = ''"></p>
 
             <div id="my_records" class="nes-container"></div>
-            Add a new record, you have <strong id="bytes_limit">2048</strong> bytes left <br>
+            <br><br>
+            <h2 class="nes-text is-primary">Add a new record</h2>
+            Tablet address: <br>
+            <div id="add-record-dropdown-container">
+                <select id="addRecordSelector" class="tablet-selector nes-select">
+                    <option value="">Select a tablet you own...</option>
+                </select>
+            </div>
+            You have <strong id="bytes_limit">2048</strong> bytes left <br>
             <textarea id="record_to_add" cols="80" rows="5" class="nes-textarea" oninput="window.update_bytes_limit()"></textarea>
             <input type="button" value="Add Record" class="nes-btn is-warning" onclick="window.add_record()"></p>
-            <p id="add_record_result"></p>
         </div>    
     </div>
     
@@ -96,7 +113,7 @@
             Tablet address: <br>
             <div id="transfer-dropdown-container">
                 <select id="transferTabletSelector" class="tablet-selector nes-select">
-                    <option value="">Select a tablet...</option>
+                    <option value="">Select a tablet you own...</option>
                 </select>
             </div>
             <input type="text" size="42" id="settings_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
@@ -111,11 +128,9 @@
                 Tablet to transfer: <br>
                 <div id="transfer-ownership-dropdown-container">
                     <select id="transferOwnershipSelector" class="tablet-selector nes-select">
-                        <option value="">Select a tablet...</option>
+                        <option value="">Select a tablet you own...</option>
                     </select>
                 </div>
-                <input type="text" size="42" id="transfer_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
-                <br><br>
                 Transfer tablet ownership to address: <br>
                 <input type="text" size="42" id="transfer_ownership_address" value="" maxlength=42 class="nes-input">
                 <input type="button" id="transferButton" value="Transfer" class="nes-btn is-warning" onclick="confirm_transfer()"></p>

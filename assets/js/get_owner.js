@@ -1,6 +1,6 @@
 function get_owner() {
     if (!window.userAccount) {
-        alert("Please connect your wallet first.");
+        showNotification("Please connect your wallet first.", "error");
         return;
     }
 
@@ -9,30 +9,30 @@ function get_owner() {
     const manualTablet = document.getElementById("settings_tablet").value;
     const tablet_address = selectedTablet || manualTablet;
 
-    console.log("Get owner attempt:", {
-        selectedTablet,
-        manualTablet,
-        finalAddress: tablet_address
-    });
-
     if (!tablet_address) {
-        alert("Please select a tablet or enter a tablet address");
+        showNotification("Please select a tablet or enter a tablet address", "error");
         return;
     }
 
     const tablet_instance = window.get_tablet_instance(tablet_address);
     if (!tablet_instance) {
         console.error("Failed to get tablet instance for address:", tablet_address);
+        showNotification("Failed to get tablet instance", "error");
         return;
     }
+
+    // Show loading notification
+    showNotification("Fetching owner...", "info");
 
     tablet_instance.methods.tablet_owner().call()
         .then(owner => {
             document.getElementById("tablet_owner").innerHTML = owner;
+            showNotification("Owner found!", "success");
         })
         .catch(error => {
             console.error("Error getting owner:", error);
-            document.getElementById("tablet_owner").innerHTML = "Error: " + error.message;
+            showNotification("Error: " + error.message, "error");
+            document.getElementById("tablet_owner").innerHTML = "";
         });
 }
 

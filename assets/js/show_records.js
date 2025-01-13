@@ -28,6 +28,12 @@ function show_records() {
 
     // Clear previous records
     document.getElementById("my_records").innerHTML = "";
+    // Show loading state
+    document.getElementById("my_records").innerHTML = `
+        <div class="records-table-container">
+            <div class="loading-message">Loading records...</div>
+        </div>
+    `;
 
     // Get tablet length
     tablet_instance.methods.tablet_length().call()
@@ -60,35 +66,51 @@ function show_records() {
                         </tr>
             `;
 
-            // Fetch each record
+            // Create an array to store all records before displaying
+            let records = [];
             let fetchedRecords = 0;
+
+            // Fetch each record
             for (let i = 0; i < length; i++) {
                 tablet_instance.methods.records(i).call()
                     .then(record => {
                         // Remove everything before // in the record
                         const cleanedRecord = record.split('//').slice(-1)[0].trim();
                         
-                        tableHTML += `
-                            <tr>
-                                <td class="record-number">#${i + 1}</td>
-                                <td class="record-content">${cleanedRecord}</td>
-                            </tr>
-                        `;
+                        // Store record with its index
+                        records.push({
+                            index: i + 1,
+                            content: cleanedRecord
+                        });
+                        
                         fetchedRecords++;
                         
-                        // Update table when all records are fetched
+                        // When all records are fetched, sort and display them
                         if (fetchedRecords === parseInt(length)) {
+                            // Sort records by index
+                            records.sort((a, b) => a.index - b.index);
+                            
+                            // Add sorted records to table
+                            records.forEach(record => {
+                                tableHTML += `
+                                    <tr>
+                                        <td class="record-number">#${record.index}</td>
+                                        <td class="record-content">${record.content}</td>
+                                    </tr>
+                                `;
+                            });
+                            
                             tableHTML += '</table></div>';
                             document.getElementById("my_records").innerHTML = tableHTML;
                         }
                     })
                     .catch(error => {
                         console.error(`Error fetching record ${i}:`, error);
-                        tableHTML += `
-                            <tr>
-                                <td colspan="2" class="error-text">Error fetching record #${i + 1}: ${error.message}</td>
-                            </tr>
-                        `;
+                        fetchedRecords++;
+                        records.push({
+                            index: i + 1,
+                            content: `Error: ${error.message}`
+                        });
                     });
             }
         })

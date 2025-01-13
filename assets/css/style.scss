@@ -442,6 +442,87 @@ body.is-dark {
     color: black !important;
 }
 
+// All Tablets table styles
+#all_tablets_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: white;
+    border: 4px solid #000;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+    
+    th, td {
+        padding: 12px;
+        background-color: white !important;
+        color: black !important;
+        border: 2px solid #000;
+        max-width: 200px;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+    }
+    
+    th {
+        font-family: 'Press Start 2P', monospace;
+        font-size: 0.8em;
+        user-select: all;
+        cursor: text;
+        text-align: center;
+        padding: 15px;
+        white-space: normal;
+        
+        &::selection {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+    }
+    
+    td {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        white-space: normal;
+        word-break: break-word;
+        border-left: 2px solid #000;
+        border-bottom: 2px solid #000;
+        text-align: center;
+    }
+    
+    // Column widths
+    .col-num {
+        width: 5%;
+    }
+    .col-name {
+        width: 15%;
+    }
+    .col-address {
+        width: 35%;
+    }
+    .col-creator {
+        width: 25%;
+    }
+    .col-owner {
+        width: 20%;
+    }
+    
+    tr {
+        &:last-child {
+            border-bottom: none;
+        }
+        
+        &:hover td {
+            background-color: #f9f9f9 !important;
+        }
+    }
+    
+    .contract-link {
+        color: #209cee !important;
+        text-decoration: none;
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
 // Responsive adjustments
 @media screen and (max-width: 768px) {
     .records-table {
@@ -456,6 +537,43 @@ body.is-dark {
             padding: 8px;
         }
     }
+    
+    #all_tablets_table {
+        font-size: 14px;
+        
+        th, td {
+            padding: 8px;
+        }
+        
+        // Stack the table on mobile
+        thead {
+            display: none;
+        }
+        
+        tr {
+            display: block;
+            margin-bottom: 1em;
+            border: 1px solid #ddd;
+        }
+        
+        td {
+            display: block;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+            
+            &:before {
+                content: attr(data-label);
+                float: left;
+                font-weight: bold;
+                font-family: 'Press Start 2P', monospace;
+                font-size: 0.8em;
+            }
+            
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+    }
 }
 
 /* Title styles */
@@ -463,4 +581,68 @@ h1.nes-text.is-primary {
     text-align: center;
     margin: 20px 0;
     font-size: 2em;
+}
+
+/* Loading state */
+.loading-message {
+    text-align: center;
+    padding: 20px;
+    color: black;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.9em;
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: white;
+    border: 2px solid #000;
+    color: black;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8em;
+    z-index: 1000;
+    animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s;
+    white-space: pre-wrap;
+    max-width: 400px;
+}
+
+.notification.error {
+    border-color: #ff0000;
+}
+
+.notification.success {
+    border-color: #28a745;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Pagination styles */
+.pagination-controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    .page-info {
+        font-family: 'Press Start 2P', monospace;
+        font-size: 0.8em;
+        color: black;
+    }
+
+    .nes-btn.is-disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }

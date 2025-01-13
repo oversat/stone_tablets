@@ -29,12 +29,14 @@ function populate_tablet_dropdowns() {
     const recordsDropdownContainer = document.getElementById('records-dropdown-container');
     const transferDropdownContainer = document.getElementById('transfer-dropdown-container');
     const transferOwnershipDropdownContainer = document.getElementById('transfer-ownership-dropdown-container');
+    const addRecordDropdownContainer = document.getElementById('add-record-dropdown-container');
     
-    if (!recordsDropdownContainer || !transferDropdownContainer || !transferOwnershipDropdownContainer) {
+    if (!recordsDropdownContainer || !transferDropdownContainer || !transferOwnershipDropdownContainer || !addRecordDropdownContainer) {
         console.error("Dropdown containers not found:", {
             records: !!recordsDropdownContainer,
             transfer: !!transferDropdownContainer,
-            transferOwnership: !!transferOwnershipDropdownContainer
+            transferOwnership: !!transferOwnershipDropdownContainer,
+            addRecord: !!addRecordDropdownContainer
         });
         return;
     }
@@ -53,6 +55,11 @@ function populate_tablet_dropdowns() {
     `;
     transferOwnershipDropdownContainer.innerHTML = `
         <select id="transferOwnershipSelector" class="tablet-selector nes-select">
+            <option value="">Select a tablet...</option>
+        </select>
+    `;
+    addRecordDropdownContainer.innerHTML = `
+        <select id="addRecordSelector" class="tablet-selector nes-select">
             <option value="">Select a tablet...</option>
         </select>
     `;
@@ -110,6 +117,7 @@ function populate_tablet_dropdowns() {
                             recordsDropdown.insertAdjacentHTML('beforeend', option);
                             transferDropdown.insertAdjacentHTML('beforeend', option);
                             document.getElementById('transferOwnershipSelector')?.insertAdjacentHTML('beforeend', option);
+                            document.getElementById('addRecordSelector')?.insertAdjacentHTML('beforeend', option);
 
                             retrieved_tablets_count++;
                             console.log(`Retrieved ${retrieved_tablets_count} of ${tablets_count} tablets`);
@@ -165,6 +173,8 @@ function setupTabletSelector(dropdownId, inputId) {
         console.log(`Dropdown ${dropdownId} changed to:`, event.target.value);
         // Set the input value to the selected tablet address
         input.value = event.target.value;
+        // Trigger change event to update any dependent UI
+        input.dispatchEvent(new Event('change'));
         
         // Clear the dropdown selection if input is manually cleared
         if (!input.value) {
@@ -175,15 +185,23 @@ function setupTabletSelector(dropdownId, inputId) {
     // Handle manual input
     input.addEventListener('input', (event) => {
         console.log(`Input ${inputId} changed to:`, event.target.value);
+        // If text is entered manually, clear and disable the dropdown
         if (event.target.value) {
-            // If text is entered manually, disable the dropdown
             dropdown.disabled = true;
-        } else {
-            // If input is cleared, enable the dropdown
-            dropdown.disabled = false;
             dropdown.value = '';
+        } else {
+            // If input is cleared, enable the dropdown and restore its value
+            dropdown.disabled = false;
+            // Re-populate dropdown if needed
+            window.populate_tablet_dropdowns();
         }
     });
+
+    // Initial check - if input has text, disable dropdown
+    if (input.value) {
+        dropdown.disabled = true;
+        dropdown.value = '';
+    }
 }
 
 // Export the functions

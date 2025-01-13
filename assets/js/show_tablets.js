@@ -13,14 +13,12 @@ function show_tablets() {
         return;
     }
 
-    // Initialize table HTML with black text class for headers
-    let my_tablets_table_html = `
-        <table id="tablets_table" class="nes-table is-bordered is-centered">
-            <tr>
-                <th class="row-ID table-header">№</th>
-                <th class="row-name table-header">Name</th>
-                <th class="row-address table-header">Address</th>
-            </tr>`;
+    // Show loading indicator
+    document.getElementById("my_tablets").innerHTML = `
+        <div class="loading-message">
+            Loading your tablets...
+        </div>
+    `;
 
     var creator_address = window.userAccount;
     var tablet_factory_instance = window.tabletFactoryContract;
@@ -40,6 +38,23 @@ function show_tablets() {
     .then(tablets_count => {
         console.log("tablets_count " + tablets_count);
         
+        if (tablets_count == 0) {
+            document.getElementById("my_tablets").innerHTML = `
+                <div class="nes-text is-warning">
+                    No tablets found. Create your first tablet above!
+                </div>`;
+            return;
+        }
+
+        // Initialize table HTML
+        let my_tablets_table_html = `
+            <table id="tablets_table" class="nes-table is-bordered is-centered">
+                <tr>
+                    <th class="row-ID table-header">№</th>
+                    <th class="row-name table-header">Name</th>
+                    <th class="row-address table-header">Address</th>
+                </tr>`;
+
         var retrieved_tables_count = 0;
         for (let t = 0; t < tablets_count; t++) {
             (function (t) {

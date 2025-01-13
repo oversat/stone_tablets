@@ -6,6 +6,7 @@ function confirm_transfer() {
     transferButton.value = "Are you really sure?!";
     transferButton.onclick = transfer_ownership;
     transferButton.classList.add("is-shaking");
+    showNotification("Please confirm you want to transfer ownership", "info");
     setTimeout(() => {
         transferButton.classList.remove("is-shaking");
     }, 1000);
@@ -13,7 +14,7 @@ function confirm_transfer() {
 
 function transfer_ownership() {
     if (typeof window.ethereum === "undefined") {
-        alert("MetaMask is not installed. Please install MetaMask and try again.");
+        showNotification("MetaMask is not installed. Please install MetaMask and try again.", "error");
         return;
     }
 
@@ -30,13 +31,13 @@ function transfer_ownership() {
     
     // Validate input
     if (!tablet_address) {
-        alert("Please select a tablet or enter a tablet address");
+        showNotification("Please select a tablet or enter a tablet address", "error");
         return;
     }
     
     const new_owner_address = document.getElementById("transfer_ownership_address").value;
     if (!new_owner_address) {
-        alert("Please enter the new owner's address");
+        showNotification("Please enter the new owner's address", "error");
         return;
     }
 
@@ -49,6 +50,7 @@ function transfer_ownership() {
     const tablet_instance = window.get_tablet_instance(tablet_address);
     if (!tablet_instance) {
         console.error("Failed to get tablet instance for address:", tablet_address);
+        showNotification("Failed to get tablet instance", "error");
         return;
     }
 
@@ -62,26 +64,21 @@ function transfer_ownership() {
     tablet_instance.methods.change_owner(new_owner_address)
         .send({ from: window.userAccount })
         .on('transactionHash', function(hash) {
-            document.getElementById("transfer_ownership_result").innerHTML = "transferring";
-            document.getElementById("transfer_ownership_result").className = "pending";
+            showNotification("Transferring ownership...", "info");
             console.log("transfer_ownership tx: " + hash);
         })
         .on('receipt', function(receipt) {
             if (receipt.status) {
-                document.getElementById("transfer_ownership_result").innerHTML = "ownership has been transferred!";
-                document.getElementById("transfer_ownership_result").className = "";
+                showNotification("Ownership has been transferred!", "success");
+                // Clear the form
+                document.getElementById("transfer_ownership_address").value = "";
             } else {
-                document.getElementById("transfer_ownership_result").innerHTML = 
-                    "transaction: <a href='https://" + window.userAccount + ".etherscan.io/tx/" + 
-                    receipt.transactionHash + "' target='_blank'>" +
-                    receipt.transactionHash + "</a> failed!";
-                document.getElementById("transfer_ownership_result").className = "tx_error";
+                showNotification("Transfer failed!", "error");
             }
         })
         .on('error', function(error) {
             console.error("Transfer error:", error);
-            document.getElementById("transfer_ownership_result").innerHTML = "Error: " + error.message;
-            document.getElementById("transfer_ownership_result").className = "tx_error";
+            showNotification("Error: " + error.message, "error");
             
             // Reset the button on error
             transferButton.value = "transfer";
