@@ -99,3 +99,18 @@ function show_tablets() {
 
 // Export the function
 window.show_tablets = show_tablets;
+
+// Update wherever you display addresses
+async function displayTabletInfo(tablet) {
+    const ownerDisplay = await formatAddress(tablet.owner);
+    const creatorDisplay = await formatAddress(tablet.creator);
+    
+    return `
+        <tr>
+            <td>${tablet.name}</td>
+            <td>${ownerDisplay}</td>
+            <td>${creatorDisplay}</td>
+            <td>${tablet.address}</td>
+        </tr>
+    `;
+}

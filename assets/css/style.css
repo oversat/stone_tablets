@@ -359,8 +359,6 @@ body.is-dark #walletAddress {
   color: black !important;
 }
 
-
-
 /* Keep error messages in red */
 .tx_error {
   color: #ff0000 !important;
@@ -641,6 +639,140 @@ h1.nes-text.is-primary {
 .pagination-controls .nes-btn.is-disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Tab Navigation Styles */
+.tab-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.tab-navigation .nes-btn {
+  min-width: auto;
+  padding: 8px 15px;
+  margin: 5px;
+  font-size: 0.9em;
+}
+.tab-navigation .nes-btn.is-primary {
+  pointer-events: none;
+  background-color: #209cee;
+  color: white !important;
+}
+.tab-navigation .menu-toggle {
+  display: none;
+  font-size: 1.5em;
+  padding: 5px 15px;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .tab-navigation {
+    position: relative;
+    align-items: center;
+    padding: 0 10px;
+  }
+  .tab-navigation .menu-toggle {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .tab-navigation .nav-buttons {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+  }
+  .tab-navigation .nav-buttons.show {
+    display: flex;
+  }
+  .tab-navigation .nes-btn {
+    width: 100%;
+    font-size: 1em;
+    padding: 12px;
+    margin: 5px 0;
+  }
+}
+@media screen and (max-width: 480px) {
+  .tab-navigation {
+    max-width: 300px;
+  }
+}
+/* Retro Console Notifications */
+.console-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #000;
+  color: #00ff00;
+  font-family: "Press Start 2P", monospace;
+  padding: 15px;
+  border: 2px solid #00ff00;
+  max-width: 400px;
+  font-size: 0.8em;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out, glow 1.5s ease-in-out infinite;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px #00ff00;
+  }
+  50% {
+    box-shadow: 0 0 20px #00ff00;
+  }
+  100% {
+    box-shadow: 0 0 5px #00ff00;
+  }
+}
+.console-notification::before {
+  content: "> ";
+  color: #00ff00;
+}
+
+/* Contract Address Link */
+.contract-address {
+  text-align: center;
+  margin: -15px 0 15px 0;
+  font-size: 0.7em;
+}
+
+.contract-link {
+  color: #209cee;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.contract-link:hover {
+  color: #4aa9fa;
+  text-decoration: underline;
+}
+
+body.is-dark .contract-link {
+  color: #4aa9fa;
+}
+
+body.is-dark .contract-link:hover {
+  color: #6cbbff;
 }
 
 /*# sourceMappingURL=style.css.map */

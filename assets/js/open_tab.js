@@ -1,23 +1,43 @@
 function initializeTabs() {
-    // Hide all tabs initially except factory
-    document.getElementById('tablet_tab').style.display = 'none';
-    document.getElementById('settings_tab').style.display = 'none';
-    document.getElementById('factory_tab').style.display = 'block';
-}
-
-function open_tab(tab) {
-    var i, tabcontent;//, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
+    // Hide all tabs except the first one
+    const tabs = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < tabs.length; i++) {
+        tabs[i].style.display = 'none';
     }
-    // tablinks = document.getElementsByClassName("tablinks");
-    // for (i = 0; i < tablinks.length; i++) {
-    //     tablinks[i].className = tablinks[i].className.replace(" active", "");
-    // }
-    document.getElementById(tab).style.display = "inline";
-    //evt.currentTarget.className += " active";
+    // Show the first tab
+    document.getElementById('createTablet').style.display = 'block';
 }
 
-window.open_tab = open_tab;
+function openTab(tabId) {
+    // Hide all tabs
+    const tabs = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < tabs.length; i++) {
+        tabs[i].style.display = 'none';
+    }
+    
+    // Show the selected tab
+    document.getElementById(tabId).style.display = 'block';
+    
+    // Update active button state
+    const buttons = document.querySelectorAll('.tab-navigation .nes-btn');
+    buttons.forEach(button => {
+        button.classList.remove('is-primary');
+        if (button.getAttribute('onclick').includes(tabId)) {
+            button.classList.add('is-primary');
+        }
+    });
+    
+    // Close mobile menu after selection
+    if (window.innerWidth <= 768) {
+        document.querySelector('.nav-buttons').classList.remove('show');
+    }
+}
+
+function toggleMenu() {
+    const navButtons = document.querySelector('.nav-buttons');
+    navButtons.classList.toggle('show');
+}
+
+window.openTab = openTab;
+window.toggleMenu = toggleMenu;
 window.initializeTabs = initializeTabs;

@@ -27,11 +27,15 @@ async function getAllTablets(page = 1, pageSize = 10) {
                 const tabletInstance = window.get_tablet_instance(tablet.tablet_address);
                 const currentOwner = await tabletInstance.methods.tablet_owner().call();
                 
+                // Format addresses
+                const formattedCreator = await window.formatAddress(creator);
+                const formattedOwner = await window.formatAddress(currentOwner);
+                
                 allTablets.push({
                     name: web3.utils.hexToAscii(tablet.tablet_name).replace(/\u0000/g, ''),
                     address: tablet.tablet_address,
-                    creator: creator,
-                    currentOwner: currentOwner
+                    creator: formattedCreator,
+                    currentOwner: formattedOwner
                 });
             }
         }

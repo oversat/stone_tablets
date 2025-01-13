@@ -2,28 +2,14 @@ function populate_tablet_dropdowns() {
     console.log("Starting populate_tablet_dropdowns...");
     
     // Check wallet and contract
-    console.log("Current state:", {
-        userAccount: window.userAccount,
-        tabletFactoryContract: window.tabletFactoryContract,
-        hasContract: !!window.tabletFactoryContract,
-        hasMethods: !!(window.tabletFactoryContract?.methods),
-    });
-
     if (!window.userAccount) {
         console.error("No user account found");
         return;
     }
     if (!window.tabletFactoryContract) {
         console.error("No tablet factory contract instance found");
-        console.error("Contract state:", {
-            exists: !!window.tabletFactoryContract,
-            type: typeof window.tabletFactoryContract,
-            methods: window.tabletFactoryContract?.methods
-        });
         return;
     }
-    console.log("User account:", window.userAccount);
-    console.log("Factory contract:", window.tabletFactoryContract);
 
     // Get dropdown containers
     const recordsDropdownContainer = document.getElementById('records-dropdown-container');
@@ -55,19 +41,17 @@ function populate_tablet_dropdowns() {
     `;
     transferOwnershipDropdownContainer.innerHTML = `
         <select id="transferOwnershipSelector" class="tablet-selector nes-select">
-            <option value="">Select a tablet...</option>
+            <option value="">Select a tablet you own...</option>
         </select>
     `;
     addRecordDropdownContainer.innerHTML = `
         <select id="addRecordSelector" class="tablet-selector nes-select">
-            <option value="">Select a tablet...</option>
+            <option value="">Select a tablet you own...</option>
         </select>
     `;
 
     const creator_address = window.userAccount;
     const tablet_factory_instance = window.tabletFactoryContract;
-
-    console.log("Checking contract methods...", tablet_factory_instance.methods);
 
     // Verify the contract method exists
     if (!tablet_factory_instance.methods.creator_tablets_count) {
@@ -85,6 +69,8 @@ function populate_tablet_dropdowns() {
                 const noTabletsOption = '<option value="">No tablets found</option>';
                 document.getElementById('tabletRecordsSelector').innerHTML = noTabletsOption;
                 document.getElementById('transferTabletSelector').innerHTML = noTabletsOption;
+                document.getElementById('transferOwnershipSelector').innerHTML = noTabletsOption;
+                document.getElementById('addRecordSelector').innerHTML = noTabletsOption;
                 return;
             }
 
@@ -92,71 +78,32 @@ function populate_tablet_dropdowns() {
             console.log(`Starting to fetch ${tablets_count} tablets...`);
 
             for (let t = 0; t < tablets_count; t++) {
-                (function(t) {
-                    console.log(`Fetching tablet ${t}...`);
-                    tablet_factory_instance.methods.tablets(creator_address, t).call()
-                        .then(tablet => {
-                            console.log(`Tablet ${t} data:`, tablet);
-                            const tabletName = web3.utils.hexToAscii(tablet.tablet_name).replace(/\u0000/g, '');
-                            console.log(`Tablet ${t} name:`, tabletName);
-                            
-                            const option = `<option value="${tablet.tablet_address}">${tabletName} (${tablet.tablet_address})</option>`;
-                            
-                            // Verify dropdowns exist before updating
-                            const recordsDropdown = document.getElementById('tabletRecordsSelector');
-                            const transferDropdown = document.getElementById('transferTabletSelector');
-                            
-                            if (!recordsDropdown || !transferDropdown) {
-                                console.error("Dropdowns not found during update:", {
-                                    records: !!recordsDropdown,
-                                    transfer: !!transferDropdown
-                                });
-                                return;
-                            }
+                tablet_factory_instance.methods.tablets(creator_address, t).call()
+                    .then(tablet => {
+                        console.log(`Retrieved tablet ${t}:`, tablet);
+                        const tabletName = web3.utils.hexToAscii(tablet.tablet_name).replace(/\u0000/g, '');
+                        const option = `<option value="${tablet.tablet_address}">${tabletName} (${tablet.tablet_address})</option>`;
+                        
+                        document.getElementById('tabletRecordsSelector')?.insertAdjacentHTML('beforeend', option);
+                        document.getElementById('transferTabletSelector')?.insertAdjacentHTML('beforeend', option);
+                        document.getElementById('transferOwnershipSelector')?.insertAdjacentHTML('beforeend', option);
+                        document.getElementById('addRecordSelector')?.insertAdjacentHTML('beforeend', option);
 
-                            recordsDropdown.insertAdjacentHTML('beforeend', option);
-                            transferDropdown.insertAdjacentHTML('beforeend', option);
-                            document.getElementById('transferOwnershipSelector')?.insertAdjacentHTML('beforeend', option);
-                            document.getElementById('addRecordSelector')?.insertAdjacentHTML('beforeend', option);
-
-                            retrieved_tablets_count++;
-                            console.log(`Retrieved ${retrieved_tablets_count} of ${tablets_count} tablets`);
-
-                            if (retrieved_tablets_count === parseInt(tablets_count)) {
-                                console.log("All tablets retrieved, sorting dropdowns...");
-                                ['tabletRecordsSelector', 'transferTabletSelector'].forEach(dropdownId => {
-                                    const dropdown = document.getElementById(dropdownId);
-                                    if (!dropdown) {
-                                        console.error(`Dropdown ${dropdownId} not found during sorting`);
-                                        return;
-                                    }
-                                    const options = Array.from(dropdown.options).slice(1);
-                                    options.sort((a, b) => a.text.localeCompare(b.text));
-                                    dropdown.innerHTML = '<option value="">Select a tablet...</option>';
-                                    options.forEach(option => dropdown.add(option));
-                                });
-                                console.log("Dropdowns sorted and updated");
-                            }
-                        })
-                        .catch(error => {
-                            console.error(`Error fetching tablet ${t}:`, error);
-                        });
-                })(t);
+                        retrieved_tablets_count++;
+                        console.log(`Retrieved ${retrieved_tablets_count} of ${tablets_count} tablets`);
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching tablet ${t}:`, error);
+                    });
             }
         })
         .catch(error => {
             console.error("Error getting tablets count:", error);
-            console.error("Error details:", {
-                message: error.message,
-                stack: error.stack,
-                contract: tablet_factory_instance,
-                userAccount: creator_address
-            });
-            const errorOption = '<option value="">Error loading tablets</option>';
-            document.getElementById('tabletRecordsSelector').innerHTML = errorOption;
-            document.getElementById('transferTabletSelector').innerHTML = errorOption;
         });
 }
+
+// Export the function
+window.populate_tablet_dropdowns = populate_tablet_dropdowns;
 
 // Handle dropdown and input field interaction
 function setupTabletSelector(dropdownId, inputId) {
@@ -204,8 +151,6 @@ function setupTabletSelector(dropdownId, inputId) {
     }
 }
 
-// Export the functions
-window.populate_tablet_dropdowns = populate_tablet_dropdowns;
 window.setupTabletSelector = setupTabletSelector;
 
 // Update dropdowns when account changes

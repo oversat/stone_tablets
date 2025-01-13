@@ -36,7 +36,18 @@
     <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body class="nes-container is-dark with-title">
-    <h1 class="nes-text is-primary">Stone Tablet Factory 2017</h1>
+    <!-- Contract Address Link -->
+    <div class="contract-address">
+        <h1 class="nes-text is-primary">Stone Tablet Factory 2017</h1>
+
+        <a href="https://etherscan.io/address/0x1cf47e78bf9c5e0403facf7b9b261be3998deb8f" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="nes-text contract-link">
+            Contract: 0x1CF4...eB8F
+        </a>
+    </div>
+
     <div class="row">
         <div id="connect-wallet" class="nes-container with-title centered-container">
             <div class="wallet-controls">
@@ -52,7 +63,20 @@
         </div>
     </div>
 
-    <div id="tablet-creation" class="centered-container">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+        <button class="nes-btn menu-toggle" onclick="toggleMenu()">☰</button>
+        <div class="nav-buttons">
+            <button class="nes-btn" onclick="openTab('createTablet')">Create Tablet</button>
+            <button class="nes-btn" onclick="openTab('myTablets')">My Tablets</button>
+            <button class="nes-btn" onclick="openTab('allTablets')">All Tablets</button>
+            <button class="nes-btn" onclick="openTab('tabletRecords')">Records</button>
+            <button class="nes-btn" onclick="openTab('tabletSettings')">Transfer</button>
+        </div>
+    </div>
+
+    <!-- Create Tablet Tab -->
+    <div id="createTablet" class="tab-content centered-container">
         <h2 class="nes-text is-primary">Create a New Tablet</h2>
         <label for="desired_tablet_name" class="nes-text">Tablet Name (32 chars max):</label>
         <input type="text" id="desired_tablet_name" maxlength="32" class="nes-input" placeholder="Enter tablet name">
@@ -63,19 +87,22 @@
         <button id="createTabletButton" class="nes-btn is-warning" onclick="make_tablet()">Create Tablet</button>
     </div>
 
-    <div id="my-tablets" class="nes-container with-title centered-container">
+    <!-- My Tablets Tab -->
+    <div id="myTablets" class="tab-content centered-container">
         <h2 class="nes-text is-primary">My Tablets</h2>
         <button id="showTabletsButton" class="nes-btn is-warning">Show My Tablets</button>
         <div id="my_tablets"></div>
     </div>
 
-    <div id="all-tablets" class="nes-container with-title centered-container">
+    <!-- All Tablets Tab -->
+    <div id="allTablets" class="tab-content centered-container">
         <h2 class="nes-text is-primary">All Tablets</h2>
         <button id="showAllTabletsButton" class="nes-btn is-warning" onclick="showAllTablets()">Show All Tablets</button>
         <div id="all_tablets_container"></div>
     </div>
 
-    <div id="tablet_tab" class="centered-container">
+    <!-- Tablet Records Tab -->
+    <div id="tabletRecords" class="tab-content centered-container">
         <h2 class="nes-text is-primary">Tablet Records</h2>
         <div class="nes-container with-title centered-container">
             Tablet address: <br>
@@ -105,22 +132,22 @@
     
     <!-- <p></p> -->
 
-    <div id="settings_tab" class="centered-container nes-container with-title centered-container">
+    <!-- Settings Tab -->
+    <div id="tabletSettings" class="tab-content centered-container">
+        <h2 class="nes-text is-primary">Tablet Settings</h2>
         <fieldset>
-            <legend><h2>Tablet settings</h2></legend>
+            <legend><h2>Check Tablet Ownership</h2></legend>
             Tablet address: <br>
             <div id="transfer-dropdown-container">
                 <select id="transferTabletSelector" class="tablet-selector nes-select">
-                    <option value="">Select a tablet you own...</option>
+                    <option value="">Select a tablet...</option>
                 </select>
             </div>
             <input type="text" size="42" id="settings_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
-            <p>Tablet owner: <span id="tablet_owner"></span> </p>
-            <fieldset>
-               
-            </fieldset>
+            <p>Tablet owner: <span id="tablet_owner"></span></p>
             <input type="button" value="Show Owner" class="nes-btn is-warning" onclick="get_owner()">
             <p></p>
+
             <fieldset class="danger-zone">
                 <legend><h3 class="danger-zone-title">DANGER ZONE! Transfer ownership</h3></legend>
                 Tablet to transfer: <br>
@@ -129,6 +156,7 @@
                         <option value="">Select a tablet you own...</option>
                     </select>
                 </div>
+                <input type="text" size="42" id="transfer_tablet" value="" maxlength=42 class="nes-input" placeholder="Enter tablet address">
                 Transfer tablet ownership to address: <br>
                 <input type="text" size="42" id="transfer_ownership_address" value="" maxlength=42 class="nes-input">
                 <input type="button" id="transferButton" value="Transfer" class="nes-btn is-warning" onclick="confirm_transfer()"></p>
@@ -149,6 +177,9 @@
             
             // Initialize theme switcher
             window.initializeThemeSwitcher();
+            
+            // Initialize tabs
+            window.initializeTabs();
             
             // Show My Tablets button
             document.getElementById("showTabletsButton").addEventListener("click", show_tablets);
