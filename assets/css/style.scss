@@ -1,4 +1,5 @@
-@import "{{ site.theme }}";
+@import "https://cdnjs.cloudflare.com/ajax/libs/nes.css/2.3.0/css/nes.min.css";
+@import "https://fonts.googleapis.com/css?family=Press+Start+2P";
 
 /* Theme Variables */
 :root {
@@ -224,6 +225,18 @@ body.is-light {
     }
 }
 
+body.is-light .nes-text.is-primary {
+    color: #209cee;
+}
+
+body.is-light #tablet_owner {
+    color: black !important;
+}
+
+body.is-light #walletAddress {
+    color: black !important;
+}
+
 /* Dark mode specific overrides */
 body.is-dark {
     .nes-text.is-primary {
@@ -244,6 +257,22 @@ body.is-dark {
     #walletAddress {
         color: white !important;
     }
+}
+
+body.is-dark .nes-text.is-primary {
+    color: #4aa9fa;
+}
+
+body.is-dark .nes-btn {
+    color: black !important;
+}
+
+body.is-dark #tablet_owner {
+    color: white !important;
+}
+
+body.is-dark #walletAddress {
+    color: white !important;
 }
 
 /* Responsive adjustments */
@@ -317,14 +346,8 @@ body.is-dark {
     }
 }
 
-/* Settings and status text */
-#tablet_owner,
-#walletAddress,
-#transactionStatus,
-#add_record_result,
-#transfer_ownership_result:not(.tx_error) {
-    /* Remove default color to allow mode-specific colors */
-}
+
+
 
 /* Keep error messages in red */
 .tx_error {
